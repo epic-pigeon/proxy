@@ -6,9 +6,10 @@ const process = require("process");
 
 function generateHttpResponse(response, status = "200 OK") {
     response = response.toString();
-    return `HTTP/1.1 ${status}\n` +
-        `Content-Length: ${response.length}\n` +
-        `Content-Type: text/html\n` +
+    return `HTTP/1.1 ${status}\r\n` +
+        `Content-Length: ${response.length}\r\n` +
+        `Content-Type: text/html\r\n` +
+        `Connection: text/html\r\n` +
         response;
 }
 
