@@ -18,11 +18,15 @@ net.createServer(function (socket) {
         let [requestType, url, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
             console.log(`Connecting to ${url} via ${protocol}...`);
-            socket.write(`Connecting to ${url} via ${protocol}...`);
+            socket.write(
+                `HTTP/1.1 200 OK\nConnecting to ${url} via ${protocol}...`
+            );
             socket.end();
         } else {
             console.log(`Wrong request type ${requestType}`);
-            socket.write("gtfo");
+            socket.write(
+                `HTTP/1.1 200 OK\ngtfo`
+            );
             socket.end();
         }
     }
