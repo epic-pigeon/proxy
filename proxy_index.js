@@ -58,5 +58,6 @@ net.createServer(function (socket) {
 }).listen(8080);
 
 function isHostAllowed(hostname) {
-    return hostname !== "info.cern.ср"
+    console.log("[is host allowed]" + hostname);
+    return hostname !== "info.cern.сh";
 }
