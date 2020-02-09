@@ -27,26 +27,26 @@ net.createServer(function (socket) {
         //console.log(encodeURI(request));
     });
     socket.on("error", console.log);
+
     function end(request) {
         console.log("-------------------------------------------------\nRequest:\n" + request);
         let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, requestUrl, protocol] = header.split(" ");
-        //if (requestType === "CONNECT") {
-            if (requestUrl.indexOf("://") === -1) requestUrl = "http://" + requestUrl;
-            console.log(`Connecting to ${requestUrl} via ${protocol}...`);
-            //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
-            let parsed = url.parse(requestUrl);
-            console.log("[end] requestUrl=" + requestUrl);
-            console.log("[end] parsed=" + JSON.stringify(parsed));
-            let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {
-            });
+        if (requestUrl.indexOf("://") === -1) requestUrl = "http://" + requestUrl;
+        console.log(`Connecting to ${requestUrl} via ${protocol}...`);
+        //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
+        let parsed = url.parse(requestUrl);
+        console.log("[end] requestUrl=" + requestUrl);
+        console.log("[end] parsed=" + JSON.stringify(parsed));
+        let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+        if (requestType === "CONNECT") {
+            socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
+            socket.pipe(connection, {end: false});
+            connection.pipe(socket, {end: false});
+        } else {
             connection.on("error", console.log);
             connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
             connection.pipe(socket);
-        //} else {
-        //    console.log(`Wrong request type ${requestType}`);
-        //    socket.write(generateHttpResponse("gtfo"));
-        //    socket.end();
-        //}
+        }
     }
 }).listen(8080);
