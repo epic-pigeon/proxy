@@ -1,5 +1,6 @@
 const http = require("http");
 const net = require("net");
+const url = require("url");
 const process = require("process");
 
 
@@ -27,12 +28,16 @@ net.createServer(function (socket) {
     });
     function end(request) {
         console.log("end");
-        let header = request.split("\r\n")[0];
+        let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, url, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
             console.log(`Connecting to ${url} via ${protocol}...`);
-            socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
-            socket.end();
+            //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
+            let parsed = url.parse();
+            net.createConnection(parseInt(parsed.port), parsed.hostname, connection => {
+                connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
+                connection.pipe(socket);
+            });
         } else {
             console.log(`Wrong request type ${requestType}`);
             socket.write(generateHttpResponse("gtfo"));
