@@ -4,6 +4,7 @@ const http = require("http");
 const net = require("net");
 const url = require("url");
 const process = require("process");
+const fs = require("fs");
 
 
 function generateHttpResponse(response, status = "200 OK") {
@@ -61,6 +62,12 @@ net.createServer(function (socket) {
 }).listen(8080);
 
 function isHostAllowed(hostname) {
-    console.log("[is host allowed] '" + hostname + "' (" + (hostname != "info.cern.ch") + ")");
-    return hostname != "info.cern.ch";
+    //console.log("[is host allowed] '" + hostname + "' (" + (hostname != "info.cern.ch") + ")");
+    //return hostname != "info.cern.ch";
+    try {
+        let bans = fs.readFileSync("./prohibited");
+        return bans.split(";").some(val => val == hostname);
+    } catch (e) {
+        console.log(e); return true;
+    }
 }
