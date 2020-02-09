@@ -37,10 +37,11 @@ net.createServer(function (socket) {
             let parsed = url.parse(requestUrl);
             console.log("[end] requestUrl=" + requestUrl);
             console.log("[end] parsed=" + JSON.stringify(parsed));
-            net.createConnection(parseInt(parsed.port), parsed.hostname, connection => {
-                connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
-                connection.pipe(socket);
+            let connection = net.createConnection(parseInt(parsed.port), parsed.hostname, () => {
             });
+            connection.on("error", console.log);
+            connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
+            connection.pipe(socket);
         } else {
             console.log(`Wrong request type ${requestType}`);
             socket.write(generateHttpResponse("gtfo"));
