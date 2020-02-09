@@ -66,7 +66,7 @@ function isHostAllowed(hostname) {
     //return hostname != "info.cern.ch";
     try {
         let bans = fs.readFileSync("./prohibited");
-        return bans.toString().split(";").some(val => val == hostname);
+        return !bans.toString().split(";").some(val => val == hostname);
     } catch (e) {
         console.log(e); return true;
     }
