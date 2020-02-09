@@ -30,7 +30,7 @@ net.createServer(function (socket) {
         console.log("Request:\n" + request);
         let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, requestUrl, protocol] = header.split(" ");
-        if (requestType === "CONNECT") {
+        //if (requestType === "CONNECT") {
             if (requestUrl.indexOf("://") === -1) requestUrl = "http://" + requestUrl;
             console.log(`Connecting to ${requestUrl} via ${protocol}...`);
             //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
@@ -40,12 +40,12 @@ net.createServer(function (socket) {
             let connection = net.createConnection(parseInt(parsed.port), parsed.hostname, () => {
             });
             connection.on("error", console.log);
-            connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
+            connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
             connection.pipe(socket);
-        } else {
-            console.log(`Wrong request type ${requestType}`);
-            socket.write(generateHttpResponse("gtfo"));
-            socket.end();
-        }
+        //} else {
+        //    console.log(`Wrong request type ${requestType}`);
+        //    socket.write(generateHttpResponse("gtfo"));
+        //    socket.end();
+        //}
     }
 }).listen(8080);
