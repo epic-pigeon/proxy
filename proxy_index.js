@@ -31,6 +31,7 @@ net.createServer(function (socket) {
         let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, requestUrl, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
+            if (requestUrl.indexOf("://") === -1) requestUrl = "http://" + requestUrl;
             console.log(`Connecting to ${requestUrl} via ${protocol}...`);
             //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
             let parsed = url.parse(requestUrl);
