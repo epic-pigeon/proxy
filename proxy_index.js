@@ -1,3 +1,5 @@
+// дима если ты это смотришь то всоси мой предсказательный пенис
+
 const http = require("http");
 const net = require("net");
 const url = require("url");
