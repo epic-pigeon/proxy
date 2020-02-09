@@ -4,15 +4,11 @@ const url = require("url");
 const process = require("process");
 
 
-function generateHttpResponse(response) {
+function generateHttpResponse(response, status = "200 OK") {
     response = response.toString();
-    return `HTTP/1.1 200 OK\n` +
-        `Date: ${new Date().toUTCString()}\n` +
-        `Server: Apache/2.2.14 (Win32)\n` +
-        `Last-Modified: ${new Date().toUTCString()}\n` +
+    return `HTTP/1.1 ${status}\n` +
         `Content-Length: ${response.length}\n` +
-        `Content-Type: text/plain\n` +
-        `Connection: Closed\n\n` +
+        `Content-Type: text/html\n` +
         response;
 }
 
@@ -38,15 +34,29 @@ net.createServer(function (socket) {
         let parsed = url.parse(requestUrl);
         console.log("[end] requestUrl=" + requestUrl);
         console.log("[end] parsed=" + JSON.stringify(parsed));
-        let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
-        connection.on("error", console.log);
         if (requestType === "CONNECT") {
-            socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
-            socket.pipe(connection, {end: false});
-            connection.pipe(socket, {end: false});
+            if (isHostAllowed(parsed.hostname)) {
+                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+                connection.on("error", console.log);
+                socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
+                socket.pipe(connection, {end: false});
+                connection.pipe(socket, {end: false});
+            } else {
+                socket.end("HTTP/1.1 403 Forbidden\r\nProxy-agent: Kar\r\n\r\n");
+            }
         } else {
-            connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
-            connection.pipe(socket);
+            if (isHostAllowed(parsed.hostname)) {
+                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+                connection.on("error", console.log);
+                connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
+                connection.pipe(socket);
+            } else {
+                socket.write(generateHttpResponse("Forbidden", "403 Forbidden"));
+            }
         }
     }
 }).listen(8080);
+
+function isHostAllowed(hostname) {
+    return hostname !== "info.cern.ср"
+}
