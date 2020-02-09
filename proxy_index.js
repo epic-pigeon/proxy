@@ -29,11 +29,11 @@ net.createServer(function (socket) {
     function end(request) {
         console.log("end");
         let [header, ...requestEnd] = request.split("\r\n");
-        let [requestType, url, protocol] = header.split(" ");
+        let [requestType, requestUrl, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
-            console.log(`Connecting to ${url} via ${protocol}...`);
+            console.log(`Connecting to ${requestUrl} via ${protocol}...`);
             //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
-            let parsed = url.parse();
+            let parsed = url.parse(requestUrl);
             net.createConnection(parseInt(parsed.port), parsed.hostname, connection => {
                 connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
                 connection.pipe(socket);
