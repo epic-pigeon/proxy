@@ -7,8 +7,11 @@ net.createServer(function (socket) {
     socket.on("data", data => {
         console.log(data.toString());
         request += data.toString();
+        if (request.endsWith("\n\n")) {
+            end(request);
+        }
     });
-    socket.on("end", () => {
+    function end(request) {
         console.log("end");
         let header = request.split("\n")[0];
         let [requestType, url, protocol] = header.split(" ");
@@ -21,5 +24,5 @@ net.createServer(function (socket) {
             socket.write("gtfo");
             socket.end();
         }
-    });
+    }
 }).listen(8080);
