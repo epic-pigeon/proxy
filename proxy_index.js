@@ -4,8 +4,12 @@ const process = require("process");
 
 net.createServer(function (socket) {
     let request = "";
-    socket.on("data", data => request += data);
+    socket.on("data", data => {
+        console.log(data.toString());
+        request += data.toString();
+    });
     socket.on("end", () => {
+        console.log("end");
         let header = request.split("\n")[0];
         let [requestType, url, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
@@ -13,6 +17,7 @@ net.createServer(function (socket) {
             socket.write(`Connecting to ${url} via ${protocol}...`);
             socket.end();
         } else {
+            console.log(`Wrong request type ${requestType}`);
             socket.write("gtfo");
             socket.end();
         }
