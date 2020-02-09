@@ -52,7 +52,7 @@ net.createServer(function (socket) {
                 connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
                 connection.pipe(socket);
             } else {
-                socket.write(generateHttpResponse("Forbidden", "403 Forbidden"));
+                socket.end(generateHttpResponse("Forbidden", "403 Forbidden"));
             }
         }
     }
