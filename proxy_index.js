@@ -5,11 +5,12 @@ const process = require("process");
 net.createServer(function (socket) {
     let request = "";
     socket.on("data", data => {
-        console.log(data.toString());
+        //console.log(data.toString());
         request += data.toString();
         if (request.endsWith("\n\n")) {
             end(request);
         }
+        console.log(encodeURI(request));
     });
     function end(request) {
         console.log("end");
