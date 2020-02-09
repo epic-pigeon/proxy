@@ -34,6 +34,8 @@ net.createServer(function (socket) {
             console.log(`Connecting to ${requestUrl} via ${protocol}...`);
             //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
             let parsed = url.parse(requestUrl);
+            console.log("[end] requestUrl=" + requestUrl);
+            console.log("[end] parsed=" + JSON.stringify(parsed));
             net.createConnection(parseInt(parsed.port), parsed.hostname, connection => {
                 connection.write(`GET ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
                 connection.pipe(socket);
