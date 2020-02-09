@@ -39,12 +39,12 @@ net.createServer(function (socket) {
         console.log("[end] requestUrl=" + requestUrl);
         console.log("[end] parsed=" + JSON.stringify(parsed));
         let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+        connection.on("error", console.log);
         if (requestType === "CONNECT") {
             socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
             socket.pipe(connection, {end: false});
             connection.pipe(socket, {end: false});
         } else {
-            connection.on("error", console.log);
             connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
             connection.pipe(socket);
         }
