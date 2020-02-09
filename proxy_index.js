@@ -27,7 +27,7 @@ net.createServer(function (socket) {
         //console.log(encodeURI(request));
     });
     function end(request) {
-        console.log("end");
+        console.log("Request:\n" + request);
         let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, requestUrl, protocol] = header.split(" ");
         if (requestType === "CONNECT") {
