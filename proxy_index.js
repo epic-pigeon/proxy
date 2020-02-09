@@ -7,10 +7,10 @@ net.createServer(function (socket) {
     socket.on("data", data => {
         //console.log(data.toString());
         request += data.toString();
-        if (request.endsWith("\n\n")) {
+        if (request.endsWith("\r\n\r\n")) {
             end(request);
         }
-        console.log(encodeURI(request));
+        //console.log(encodeURI(request));
     });
     function end(request) {
         console.log("end");
