@@ -26,6 +26,7 @@ net.createServer(function (socket) {
         }
         //console.log(encodeURI(request));
     });
+    socket.on("error", console.log);
     function end(request) {
         console.log("-------------------------------------------------\nRequest:\n" + request);
         let [header, ...requestEnd] = request.split("\r\n");
