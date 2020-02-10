@@ -12,7 +12,7 @@ function generateHttpResponse(response, status = "200 OK") {
     return `HTTP/1.1 ${status}\r\n` +
         `Content-Length: ${response.length}\r\n` +
         `Content-Type: text/html\r\n` +
-        `Connection: text/html\r\n` +
+        `Connection: close\r\n` +
         response;
 }
 
@@ -47,7 +47,7 @@ net.createServer(function (socket) {
                 });
                 connection.on("error", console.log);
             } else {
-                socket.end("HTTP/1.1 403 Forbidden\r\nProxy-agent: Kar\r\n\r\n");
+                socket.end("HTTP/1.1 403 Forbidden\r\nProxy-agent: Kar\r\nConnection: close\r\n\r\n");
             }
         } else {
             if (isHostAllowed(parsed.hostname)) {
