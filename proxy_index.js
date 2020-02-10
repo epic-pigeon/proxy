@@ -47,7 +47,7 @@ net.createServer(function (socket) {
                 });
                 connection.on("error", console.log);
             } else {
-                socket.end("HTTP/1.1 403 Forbidden\r\nProxy-agent: Kar\r\nConnection: close\r\n\r\n");
+                socket.end("HTTP/1.1 403 Forbidden\r\nStatus: 403 Forbidden\r\nProxy-agent: Kar\r\nConnection: close\r\n\r\n");
             }
         } else {
             if (isHostAllowed(parsed.hostname)) {
