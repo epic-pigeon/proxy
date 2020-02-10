@@ -29,31 +29,33 @@ net.createServer(function (socket) {
     socket.on("error", console.log);
 
     function end(request) {
-        console.log("-------------------------------------------------\nRequest:\n" + request);
+        //console.log("-------------------------------------------------\nRequest:\n" + request);
         let [header, ...requestEnd] = request.split("\r\n");
         let [requestType, requestUrl, protocol] = header.split(" ");
         if (requestUrl.indexOf("://") === -1) requestUrl = "http://" + requestUrl;
-        console.log(`Connecting to ${requestUrl} via ${protocol}...`);
+        //console.log(`Connecting to ${requestUrl} via ${protocol}...`);
         //socket.write(generateHttpResponse(`Connecting to ${url} via ${protocol}...`));
         let parsed = url.parse(requestUrl);
-        console.log("[end] requestUrl=" + requestUrl);
-        console.log("[end] parsed=" + JSON.stringify(parsed));
+        //console.log("[end] requestUrl=" + requestUrl);
+        //console.log("[end] parsed=" + JSON.stringify(parsed));
         if (requestType === "CONNECT") {
             if (isHostAllowed(parsed.hostname)) {
-                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {
+                    socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
+                    socket.pipe(connection, {end: false});
+                    connection.pipe(socket, {end: false});
+                });
                 connection.on("error", console.log);
-                socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
-                socket.pipe(connection, {end: false});
-                connection.pipe(socket, {end: false});
             } else {
                 socket.end("HTTP/1.1 403 Forbidden\r\nProxy-agent: Kar\r\n\r\n");
             }
         } else {
             if (isHostAllowed(parsed.hostname)) {
-                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {});
+                let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {
+                    connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
+                    connection.pipe(socket);
+                });
                 connection.on("error", console.log);
-                connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
-                connection.pipe(socket);
             } else {
                 socket.end(generateHttpResponse("Forbidden", "403 Forbidden"));
             }
