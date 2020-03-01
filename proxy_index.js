@@ -142,6 +142,7 @@ function handleClientConnectionError(socket) {
 function handleProxyConnectionError(connection) {
     return function(error) {
         connection.end(generateHttpResponse(`<b style="color: red;">Error occured:</b><br>${JSON.stringify(error)}`));
+        connection.destroy();
         console.log(error);
     }
 }
