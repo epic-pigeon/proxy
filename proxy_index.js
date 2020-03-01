@@ -112,7 +112,7 @@ net.createServer(function (socket) {
                             //{end: false}
                             );
                     });
-                    connection.on("error", handleProxyConnectionError(connection));
+                    connection.on("error", handleProxyConnectionError(socket));
                 } else {
                     socket.end("HTTP/1.1 403 Forbidden\r\nStatus: 403 Forbidden\r\nProxy-agent: Kar\r\nConnection: close\r\n\r\n");
                 }
@@ -122,7 +122,7 @@ net.createServer(function (socket) {
                         connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
                         connection.pipe(socket);
                     });
-                    connection.on("error", handleProxyConnectionError(connection));
+                    connection.on("error", handleProxyConnectionError(socket));
                 } else {
                     socket.end(generateHttpResponse("Forbidden", "403 Forbidden"));
                 }
@@ -139,10 +139,10 @@ function handleClientConnectionError(socket) {
     }
 }
 
-function handleProxyConnectionError(connection) {
+function handleProxyConnectionError(clientSocket) {
     return function(error) {
-        //connection.end(generateHttpResponse(`<b style="color: red;">Error occurred</b>`));
-        //connection.destroy();
+        clientSocket.end(generateHttpResponse(`<b style="color: red;">Error occurred: </b><br>${error.toString()}`));
+        //clientSocket.destroy();
         console.log("[handleProxyConnectionError] " + error);
     }
 }
