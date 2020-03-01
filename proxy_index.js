@@ -140,7 +140,7 @@ function handleClientConnectionError(socket) {
 
 function handleProxyConnectionError(clientSocket) {
     return function(error) {
-        clientSocket.end(generateHttpResponse(`<b style="color: red;">Error occurred: </b><br>${error.toString()}`));
+        clientSocket.end(generateHttpResponse(`<html lang="en"><head><title>kar</title></head><body><b style="color: red;">Error occurred: </b><br>${error.toString()}</body></html>`));
         //clientSocket.destroy();
         console.log("[handleProxyConnectionError] " + error);
     }
