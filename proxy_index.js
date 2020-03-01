@@ -105,10 +105,14 @@ net.createServer(function (socket) {
                 if (isHostAllowed(parsed.hostname)) {
                     let connection = net.createConnection(parseInt(parsed.port || "80"), parsed.hostname, () => {
                         socket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: Kar\r\n\r\n");
-                        socket.pipe(connection, {end: false});
-                        connection.pipe(socket, {end: false});
+                        socket.pipe(connection,
+                            //{end: false}
+                            );
+                        connection.pipe(socket,
+                            //{end: false}
+                            );
                     });
-                    connection.on("error", console.log);
+                    connection.on("error", handleProxyConnectionError(connection));
                 } else {
                     socket.end("HTTP/1.1 403 Forbidden\r\nStatus: 403 Forbidden\r\nProxy-agent: Kar\r\nConnection: close\r\n\r\n");
                 }
@@ -118,7 +122,7 @@ net.createServer(function (socket) {
                         connection.write(`${requestType} ${parsed.path} ${protocol}\r\n${requestEnd.join("\r\n")}`);
                         connection.pipe(socket);
                     });
-                    connection.on("error", console.log);
+                    connection.on("error", handleProxyConnectionError(connection));
                 } else {
                     socket.end(generateHttpResponse("Forbidden", "403 Forbidden"));
                 }
@@ -126,8 +130,21 @@ net.createServer(function (socket) {
         }
         //console.log(encodeURI(request));
     });
-    socket.on("error", console.log);
+    socket.on("error", handleClientConnectionError(socket));
 }).listen(8080);
+
+function handleClientConnectionError(socket) {
+    return function(error) {
+        console.log(error);
+    }
+}
+
+function handleProxyConnectionError(connection) {
+    return function(error) {
+        connection.end(generateHttpResponse(`<b style="color: red;">Error occured:</b><br>${JSON.stringify(error)}`));
+        console.log(error);
+    }
+}
 
 const equals = val => val2 => val == val2;
 
