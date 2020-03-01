@@ -134,6 +134,7 @@ net.createServer(function (socket) {
 
 function handleClientConnectionError(socket) {
     return function(error) {
+        socket.destroy();
         console.log(error);
     }
 }
